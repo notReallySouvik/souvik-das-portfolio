@@ -73,7 +73,7 @@ export default function HomePage() {
         />
 
         <motion.div
-          style={{ y: heroY, opacity: heroOpacity }}
+          style={{ y: heroY, opacity: heroOpacity,marginTop:"-10%" }}
           className="relative z-10 mx-auto flex w-full max-w-[120rem] flex-col items-center px-6 text-center md:px-12 lg:px-24"
         >
           <motion.div
