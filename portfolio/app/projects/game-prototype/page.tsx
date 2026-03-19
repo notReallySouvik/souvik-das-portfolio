@@ -9,6 +9,9 @@ export default function GamePrototypeProject() {
 The goal is to build worlds that feel coherent and reactive, where simple mechanics interact to produce interesting behaviors.`}
       techStack="Godot, GDScript, Blender"
       image="/images/projects/project-3.jpg"
+      tags={["Game Dev", "Prototype", "Worldbuilding"]}
+      status="In Development"
+      category="Game Prototype"
       github="https://github.com/yourusername/game-prototype"
     />
   );

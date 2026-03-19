@@ -1,43 +1,45 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { writings } from '@/app/data/writings';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowUpRight, Github } from 'lucide-react';
-import { projects } from '@/app/data/projects';
+import { ArrowUpRight } from 'lucide-react';
 
-type ProjectStatus =
-  | 'Planned'
-  | 'In Development'
-  | 'Paused'
-  | 'Completed'
-  | 'Maintained'
-  | 'Archived';
+type PublicationStatus =
+  | 'In Works'
+  | 'In Hiatus'
+  | 'Unreleased'
+  | 'Publishing'
+  | 'Published'
+  | 'Published for Purchase'
+  | 'Coming Soon';
 
-const statusStyles: Record<ProjectStatus, string> = {
-  Planned: 'bg-blue-500/10 text-blue-400',
-  'In Development': 'bg-purple-500/10 text-purple-400',
-  Paused: 'bg-yellow-500/10 text-yellow-400',
-  Completed: 'bg-green-500/10 text-green-400',
-  Maintained: 'bg-cyan-500/10 text-cyan-400',
-  Archived: 'bg-zinc-500/10 text-zinc-400',
+const statusStyles: Record<PublicationStatus, string> = {
+  'In Works': 'bg-blue-500/10 text-blue-400',
+  'In Hiatus': 'bg-yellow-500/10 text-yellow-400',
+  'Unreleased': 'bg-zinc-500/10 text-zinc-400',
+  'Publishing': 'bg-purple-500/10 text-purple-400',
+  'Published': 'bg-green-500/10 text-green-400',
+  'Published for Purchase': 'bg-amber-500/10 text-amber-400',
+  'Coming Soon': 'bg-cyan-500/10 text-cyan-400',
 };
 
-const allStatusOptions = ['All', ...new Set(projects.map((p) => p.status))];
-const allTagOptions = ['All', ...new Set(projects.flatMap((p) => p.tags))];
+const allStatusOptions = ['All', ...new Set(writings.map((w) => w.publicationStatus))];
+const allTagOptions = ['All', ...new Set(writings.flatMap((w) => w.tags))];
 
-export default function ProjectsPage() {
+export default function WritingPage() {
   const [selectedStatus, setSelectedStatus] = useState('All');
   const [selectedTag, setSelectedTag] = useState('All');
 
-  const filteredProjects = useMemo(() => {
-    return projects.filter((project) => {
+  const filteredWritings = useMemo(() => {
+    return writings.filter((writing) => {
       const statusMatch =
-        selectedStatus === 'All' || project.status === selectedStatus;
+        selectedStatus === 'All' || writing.publicationStatus === selectedStatus;
 
       const tagMatch =
-        selectedTag === 'All' || project.tags.includes(selectedTag);
+        selectedTag === 'All' || writing.tags.includes(selectedTag);
 
       return statusMatch && tagMatch;
     });
@@ -53,21 +55,19 @@ export default function ProjectsPage() {
           className="mb-12"
         >
           <h1 className="mb-6 text-4xl font-semibold tracking-tight md:text-5xl lg:text-6xl">
-            Projects
+            Writing
           </h1>
 
           <p className="max-w-3xl text-lg leading-relaxed text-[var(--foreground)]/78 md:text-xl">
-            Software experiments, security tools, and explorations in code.
-            Each project represents a curiosity pursued and a system explored.
+            Stories, essays, and worlds built with words. A collection of published works and upcoming books exploring human experiences.
           </p>
         </motion.div>
 
-        <div className="mb-10 space-y-6">
+        <div className="mb-8 space-y-5">
           <div>
             <p className="mb-3 text-xs uppercase tracking-[0.18em] text-[var(--foreground)]/45">
               Status
             </p>
-
             <div className="flex flex-wrap gap-3">
               {allStatusOptions.map((status) => (
                 <button
@@ -89,7 +89,6 @@ export default function ProjectsPage() {
             <p className="mb-3 text-xs uppercase tracking-[0.18em] text-[var(--foreground)]/45">
               Tags
             </p>
-
             <div className="flex flex-wrap gap-3">
               {allTagOptions.map((tag) => (
                 <button
@@ -108,15 +107,15 @@ export default function ProjectsPage() {
           </div>
         </div>
 
-        {filteredProjects.length > 0 ? (
+        {filteredWritings.length > 0 ? (
           <motion.div
             layout
             className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 lg:gap-10"
           >
             <AnimatePresence mode="popLayout">
-              {filteredProjects.map((project) => (
+              {filteredWritings.map((writing) => (
                 <motion.article
-                  key={project.slug}
+                  key={writing.slug}
                   layout
                   initial={{ opacity: 0, y: 18 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -124,34 +123,34 @@ export default function ProjectsPage() {
                   transition={{ duration: 0.25 }}
                   className="group overflow-hidden rounded-2xl border border-white/8 bg-white/[0.03] shadow-[0_0_0_1px_rgba(255,255,255,0.01)] transition-all duration-300 hover:border-[var(--accent)]/20 hover:bg-white/[0.045]"
                 >
-                  <Link href={`/projects/${project.slug}`} className="block">
-                    <div className="relative aspect-[16/10] overflow-hidden">
+                  <Link href={`/writing/${writing.slug}`} className="block">
+                    <div className="relative aspect-[3/4] overflow-hidden">
                       <Image
-                        src={project.image}
-                        alt={project.title}
+                        src={writing.coverImage}
+                        alt={writing.title}
                         fill
                         className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
                     </div>
 
-                    <div className="p-8 pb-5">
+                    <div className="p-8">
                       <h2 className="mb-3 text-2xl font-semibold transition-colors duration-300 group-hover:text-[var(--accent)]">
-                        {project.title}
+                        {writing.title}
                       </h2>
 
-                      {project.category && (
+                      {writing.category && (
                         <p className="mb-3 text-xs uppercase tracking-[0.18em] text-[var(--soft-blue)]">
-                          {project.category}
+                          {writing.category}
                         </p>
                       )}
 
                       <p className="mb-4 text-base leading-relaxed text-[var(--foreground)]/72">
-                        {project.shortDescription}
+                        {writing.shortDescription}
                       </p>
 
                       <div className="mb-4 flex flex-wrap gap-2">
-                        {project.tags.map((tag) => (
+                        {writing.tags.map((tag) => (
                           <span
                             key={tag}
                             className="rounded-full border border-white/10 px-3 py-1 text-xs text-[var(--foreground)]/60"
@@ -161,52 +160,24 @@ export default function ProjectsPage() {
                         ))}
                       </div>
 
-                      <div
-                        className={`inline-flex rounded-lg px-3 py-1 ${
-                          statusStyles[project.status]
-                        }`}
-                      >
-                        <span className="text-xs font-medium">
-                          {project.status}
+                      <div className="flex items-center justify-between gap-4">
+                        <div
+                          className={`inline-flex rounded-lg px-3 py-1 ${statusStyles[
+                            writing.publicationStatus as PublicationStatus
+                          ]}`}
+                        >
+                          <span className="text-xs font-medium">
+                            {writing.publicationStatus}
+                          </span>
+                        </div>
+
+                        <span className="inline-flex items-center gap-2 text-sm text-[var(--foreground)]/55 transition-colors duration-300 group-hover:text-[var(--foreground)]/80">
+                          <ArrowUpRight size={16} />
+                          <span>Learn more</span>
                         </span>
                       </div>
                     </div>
                   </Link>
-
-                  <div className="flex items-center justify-between gap-4 px-8 pb-8">
-                    <Link
-                      href={`/projects/${project.slug}`}
-                      className="inline-flex items-center gap-2 text-sm text-[var(--foreground)]/55 transition-colors duration-300 hover:text-[var(--foreground)]"
-                    >
-                      <ArrowUpRight size={16} />
-                      <span>Open project</span>
-                    </Link>
-
-                    <div className="flex items-center gap-3">
-                      {project.github && (
-                        <a
-                          href={project.github}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-[var(--foreground)]/60 transition-colors hover:text-[var(--foreground)]"
-                        >
-                          <Github size={18} />
-                        </a>
-                      )}
-
-                      {project.live && (
-                        <a
-                          href={project.live}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-sm text-[var(--foreground)]/60 transition-colors hover:text-[var(--foreground)]"
-                        >
-                          <ArrowUpRight size={16} />
-                          <span>Live</span>
-                        </a>
-                      )}
-                    </div>
-                  </div>
                 </motion.article>
               ))}
             </AnimatePresence>
@@ -214,7 +185,7 @@ export default function ProjectsPage() {
         ) : (
           <div className="rounded-2xl border border-white/8 bg-white/[0.03] px-8 py-16 text-center">
             <p className="text-lg text-[var(--foreground)]/60">
-              No projects match the selected filters.
+              No writing matches the selected filters.
             </p>
           </div>
         )}

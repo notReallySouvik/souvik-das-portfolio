@@ -73,7 +73,7 @@ export default function HomePage() {
         />
 
         <motion.div
-          style={{ y: heroY, opacity: heroOpacity,marginTop:"-10%" }}
+          style={{ y: heroY, opacity: heroOpacity, marginTop: "-10%" }}
           className="relative z-10 mx-auto flex w-full max-w-[120rem] flex-col items-center px-6 text-center md:px-12 lg:px-24"
         >
           <motion.div
@@ -82,10 +82,10 @@ export default function HomePage() {
             transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
             className="mb-6"
           >
-            <span className="flex items-center justify-center gap-4 text-xs font-medium uppercase tracking-[0.24em] text-[var(--accent)] md:text-sm">
-              <span className="h-px w-8 bg-[var(--accent)]/50" />
-              Archive & Workspace
-              <span className="h-px w-8 bg-[var(--accent)]/50" />
+            <span className="inline-grid grid-cols-[1fr_auto_1fr] items-center gap-4 text-xs font-medium uppercase tracking-[0.24em] text-[var(--accent)] md:text-sm">
+              <span className="h-px w-8 justify-self-end bg-[var(--accent)]/50" />
+              <span className="leading-none">Archive & Workspace</span>
+              <span className="h-px w-8 justify-self-start bg-[var(--accent)]/50" />
             </span>
           </motion.div>
 
@@ -189,9 +189,8 @@ function FeatureSection({
       className="relative flex min-h-screen w-full flex-col border-b border-white/10 lg:flex-row"
     >
       <div
-        className={`flex w-full items-center p-8 md:p-16 lg:w-1/2 lg:p-24 ${
-          isEven ? 'lg:order-1' : 'lg:order-2'
-        }`}
+        className={`flex w-full items-center p-8 md:p-16 lg:w-1/2 lg:p-24 ${isEven ? 'lg:order-1' : 'lg:order-2'
+          }`}
       >
         <div className="w-full max-w-xl lg:sticky lg:top-1/3">
           <motion.div style={{ opacity: textOpacity, y: textY }}>
@@ -219,16 +218,15 @@ function FeatureSection({
                 Explore Archive
                 <span className="absolute bottom-0 left-0 h-px w-full origin-left scale-x-0 bg-[var(--accent)] transition-transform duration-300 group-hover:scale-x-100" />
               </span>
-              <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+              <ArrowRight className="relative -top-[1px] h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
             </Link>
           </motion.div>
         </div>
       </div>
 
       <div
-        className={`relative h-[60vh] w-full overflow-hidden border-white/10 bg-white/5 lg:h-auto lg:w-1/2 ${
-          isEven ? 'lg:order-2 lg:border-l' : 'lg:order-1 lg:border-r'
-        }`}
+        className={`relative h-[60vh] w-full overflow-hidden border-white/10 bg-white/5 lg:h-auto lg:w-1/2 ${isEven ? 'lg:order-2 lg:border-l' : 'lg:order-1 lg:border-r'
+          }`}
       >
         <motion.div
           style={{ y: imageY }}

@@ -1,13 +1,22 @@
 from __future__ import annotations
 
-from pathlib import Path
 import re
-import sys
 import textwrap
+from pathlib import Path
 
+ROOT = Path(__file__).resolve().parent.parent
 
-PROJECTS_DIR = Path("src/app/projects")
-DATA_FILE = Path("src/app/data/projects.ts")
+PROJECTS_DIR = ROOT / "src/app/projects"
+DATA_FILE = ROOT / "src/app/data/projects.ts"
+
+VALID_STATUSES = {
+    "Planned",
+    "In Development",
+    "Paused",
+    "Completed",
+    "Maintained",
+    "Archived",
+}
 
 
 def prompt(label: str, default: str = "") -> str:
@@ -16,17 +25,13 @@ def prompt(label: str, default: str = "") -> str:
     return value or default
 
 
-def prompt_multiline(label: str) -> str:
-    print(f"{label} (finish with an empty line):")
-    lines: list[str] = []
+def prompt_optional(label: str) -> str:
+    return input(f"{label}: ").strip()
 
-    while True:
-        line = input()
-        if line.strip() == "":
-            break
-        lines.append(line)
 
-    return "\n".join(lines).strip()
+def prompt_description(label: str) -> str:
+    print(f"{label} (paste text and press Enter):")
+    return input("> ").strip()
 
 
 def slugify(value: str) -> str:
@@ -46,20 +51,42 @@ def escape_ts_string(value: str) -> str:
     )
 
 
+def parse_tags(raw: str) -> list[str]:
+    return [tag.strip() for tag in raw.split(",") if tag.strip()]
+
+
+def build_tags_array(tags: list[str]) -> str:
+    if not tags:
+        return "[]"
+    return "[" + ", ".join(f'"{escape_ts_string(tag)}"' for tag in tags) + "]"
+
+
+def normalize_url(value: str) -> str:
+    value = value.strip()
+    if not value:
+        return value
+    if value.startswith(("http://", "https://", "mailto:")):
+        return value
+    return f"https://{value}"
+
+
 def build_project_page(
     *,
     title: str,
     description: str,
     tech_stack: str,
     image: str,
+    tags: list[str],
+    status: str,
+    category: str,
     github: str,
     live: str,
 ) -> str:
-    title_safe = escape_ts_string(title)
-    description_safe = escape_ts_string(description)
-    tech_stack_safe = escape_ts_string(tech_stack)
-    image_safe = escape_ts_string(image)
-
+    tags_line = f"\n      tags={{{build_tags_array(tags)}}}" if tags else ""
+    status_line = f'\n      status="{escape_ts_string(status)}"' if status else ""
+    category_line = (
+        f'\n      category="{escape_ts_string(category)}"' if category else ""
+    )
     github_line = f'\n      github="{escape_ts_string(github)}"' if github else ""
     live_line = f'\n      live="{escape_ts_string(live)}"' if live else ""
 
@@ -70,10 +97,10 @@ def build_project_page(
         export default function ProjectPage() {{
           return (
             <ProjectTemplate
-              title="{title_safe}"
-              description={{`{description_safe}`}}
-              techStack="{tech_stack_safe}"
-              image="{image_safe}"{github_line}{live_line}
+              title="{escape_ts_string(title)}"
+              description={{`{escape_ts_string(description)}`}}
+              techStack="{escape_ts_string(tech_stack)}"
+              image="{escape_ts_string(image)}"{tags_line}{status_line}{category_line}{github_line}{live_line}
             />
           );
         }}
@@ -85,9 +112,12 @@ def build_project_entry(
     *,
     slug: str,
     title: str,
-    description: str,
+    short_description: str,
     tech_stack: str,
     image: str,
+    tags: list[str],
+    status: str,
+    category: str,
     github: str,
     live: str,
 ) -> str:
@@ -95,11 +125,15 @@ def build_project_entry(
         "  {",
         f'    slug: "{escape_ts_string(slug)}",',
         f'    title: "{escape_ts_string(title)}",',
-        f'    description: "{escape_ts_string(description)}",',
+        f'    shortDescription: "{escape_ts_string(short_description)}",',
         f'    techStack: "{escape_ts_string(tech_stack)}",',
         f'    image: "{escape_ts_string(image)}",',
+        f"    tags: {build_tags_array(tags)},",
+        f'    status: "{escape_ts_string(status)}",',
     ]
 
+    if category:
+        lines.append(f'    category: "{escape_ts_string(category)}",')
     if github:
         lines.append(f'    github: "{escape_ts_string(github)}",')
     if live:
@@ -116,9 +150,9 @@ def append_project_to_data_file(entry: str) -> None:
         )
 
     content = DATA_FILE.read_text(encoding="utf-8")
-
     marker = "];"
     index = content.rfind(marker)
+
     if index == -1:
         raise ValueError(f'Could not find closing "{marker}" in {DATA_FILE}')
 
@@ -148,28 +182,51 @@ def main() -> int:
         print("Error: invalid slug.")
         return 1
 
-    description = prompt_multiline("Short description for cards and project page")
-    if not description:
-        print("Error: description is required.")
+    short_description = prompt_description("Short description")
+    if not short_description:
+        print("Error: short description is required.")
+        return 1
+
+    full_description = prompt_description("Full description for project page")
+    if not full_description:
+        print("Error: full description is required.")
         return 1
 
     tech_stack = prompt("Tech stack", "Next.js, TypeScript, Tailwind CSS")
+    tags_raw = prompt("Tags (comma-separated)", "Web Dev")
+    tags = parse_tags(tags_raw)
+
+    status = prompt("Status", "In Development")
+    if status not in VALID_STATUSES:
+        print("\nError: invalid status.")
+        print("Valid options are:")
+        for item in sorted(VALID_STATUSES):
+            print(f"  - {item}")
+        return 1
+
+    category = prompt_optional("Category (optional)")
     image_name = prompt("Image file name (with extension)", f"{slug}.png")
-    image = f"/images/projects/{image_name}"    
-    github = prompt("GitHub URL (optional)")
-    live = prompt("Live URL (optional)")
+    image = f"/images/projects/{image_name}"
+
+    github = normalize_url(prompt_optional("GitHub URL (optional)"))
+    live = normalize_url(prompt_optional("Live URL (optional)"))
 
     project_dir = PROJECTS_DIR / slug
     page_file = project_dir / "page.tsx"
 
     print("\n--- Summary ---")
-    print(f"Title      : {title}")
-    print(f"Slug       : {slug}")
-    print(f"Image      : {image}")
-    print(f"GitHub     : {github or '-'}")
-    print(f"Live       : {live or '-'}")
-    print(f"Detail page: {page_file}")
-    print(f"Data file  : {DATA_FILE}")
+    print(f"Title        : {title}")
+    print(f"Slug         : {slug}")
+    print(f"Short desc   : {short_description}")
+    print(f"Tech stack   : {tech_stack}")
+    print(f"Tags         : {', '.join(tags) if tags else '-'}")
+    print(f"Status       : {status}")
+    print(f"Category     : {category or '-'}")
+    print(f"Image        : {image}")
+    print(f"GitHub       : {github or '-'}")
+    print(f"Live         : {live or '-'}")
+    print(f"Detail page  : {page_file}")
+    print(f"Data file    : {DATA_FILE}")
 
     if slug_exists_in_data_file(slug):
         overwrite_data = prompt(
@@ -181,7 +238,9 @@ def main() -> int:
             return 0
 
     if page_file.exists():
-        overwrite_page = prompt("Project page already exists. Overwrite page.tsx? (y/N)", "n").lower()
+        overwrite_page = prompt(
+            "Project page already exists. Overwrite page.tsx? (y/N)", "n"
+        ).lower()
         if overwrite_page not in {"y", "yes"}:
             print("Aborted.")
             return 0
@@ -190,9 +249,12 @@ def main() -> int:
 
     page_content = build_project_page(
         title=title,
-        description=description,
+        description=full_description,
         tech_stack=tech_stack,
         image=image,
+        tags=tags,
+        status=status,
+        category=category,
         github=github,
         live=live,
     )
@@ -201,9 +263,12 @@ def main() -> int:
     entry = build_project_entry(
         slug=slug,
         title=title,
-        description=description,
+        short_description=short_description,
         tech_stack=tech_stack,
         image=image,
+        tags=tags,
+        status=status,
+        category=category,
         github=github,
         live=live,
     )

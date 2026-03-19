@@ -9,6 +9,9 @@ export default function AegisProject() {
 The project investigates how defensive tooling can provide meaningful insight without overwhelming the user, combining monitoring, alerting, and contextual analysis.`}
       techStack="Python, TypeScript, Docker, Redis"
       image="/images/projects/project-2.png"
+      tags={["Cybersecurity", "Defense", "Systems"]}
+      status="Planned"
+      category="Defense System"
       github="https://github.com/yourusername/aegis"
     />
   );
