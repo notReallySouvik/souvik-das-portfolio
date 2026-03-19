@@ -9,6 +9,9 @@ export default function PortfolioProject() {
 Rather than a traditional portfolio, it is designed to feel like a workspace — a place where projects, ideas, and experiments are documented and explored.`}
       techStack="Next.js, TypeScript, Tailwind CSS, MDX"
       image="/images/projects/project-4.jpeg"
+      tags={["Web Dev", "Portfolio", "Design"]}
+      status="In Development"
+      category="Web Application"
       github="https://github.com/yourusername/portfolio"
     />
   );

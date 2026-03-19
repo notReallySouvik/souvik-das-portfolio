@@ -11,6 +11,9 @@ The project explores how data from multiple sources can be collected, normalized
 It focuses on modular data collectors, automated correlation, and workflows that support both exploratory investigation and structured analysis.`}
       techStack="Python, FastAPI, React, PostgreSQL"
       image="/images/projects/project-1.webp"
+      tags={["OSINT", "Cybersecurity", "Automation"]}
+      status="In Development"
+      category="Security Tool"
       github="https://github.com/yourusername/argus"
     />
   );
