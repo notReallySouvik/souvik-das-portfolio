@@ -30,6 +30,36 @@ const interests = [
     },
 ];
 
+const education = [
+    {
+        period: '2022 — 2026',
+        title: 'Bachelor of Technology in Computer Science',
+        institution: 'Your University Name',
+        description:
+            'Focused on software systems, problem solving, and the technical foundations that support my broader work across development, security, and AI.',
+    },
+    {
+        period: '2019 — 2021',
+        title: 'Higher Secondary Education',
+        institution: 'Your School Name',
+        description:
+            'Built the academic base that later expanded into programming, systems thinking, and independent technical exploration.',
+    },
+];
+
+const certifications = [
+    {
+        title: 'Google Cybersecurity Professional Certificate',
+        issuer: 'Google',
+        status: 'Completed',
+    },
+    {
+        title: 'Google Data Analytics Professional Certificate',
+        issuer: 'Google',
+        status: 'In Progress',
+    },
+];
+
 export default function AboutPage() {
     return (
         <main className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
@@ -86,6 +116,76 @@ export default function AboutPage() {
                         ))}
                     </div>
 
+                    <section className="mt-20">
+                        <h2 className="mb-12 text-3xl font-semibold tracking-tight text-[var(--foreground)] md:text-4xl">
+                            Education
+                        </h2>
+
+                        <div className="space-y-6">
+                            {education.map((item, index) => (
+                                <motion.article
+                                    key={`${item.title}-${item.period}`}
+                                    initial={{ opacity: 0, y: 28 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.45, delay: index * 0.08 }}
+                                    className="rounded-2xl border border-white/8 bg-white/[0.03] p-8 shadow-[0_0_0_1px_rgba(255,255,255,0.01)] backdrop-blur-sm md:p-10"
+                                >
+                                    <div className="mb-4 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                                        <h3 className="text-xl font-semibold text-[var(--foreground)] md:text-2xl">
+                                            {item.title}
+                                        </h3>
+                                        <span className="text-sm uppercase tracking-[0.14em] text-[var(--accent)]">
+                                            {item.period}
+                                        </span>
+                                    </div>
+
+                                    <p className="mb-4 text-sm uppercase tracking-[0.16em] text-[var(--soft-blue)]">
+                                        {item.institution}
+                                    </p>
+
+                                    <p className="text-base leading-relaxed text-[var(--foreground)]/72">
+                                        {item.description}
+                                    </p>
+                                </motion.article>
+                            ))}
+                        </div>
+                    </section>
+                    <section className="mt-20">
+                        <h2 className="mb-12 text-3xl font-semibold tracking-tight text-[var(--foreground)] md:text-4xl">
+                            Certifications
+                        </h2>
+
+                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                            {certifications.map((cert, index) => (
+                                <motion.article
+                                    key={cert.title}
+                                    initial={{ opacity: 0, y: 28 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.45, delay: index * 0.08 }}
+                                    className="rounded-2xl border border-white/8 bg-white/[0.03] p-6 backdrop-blur-sm"
+                                >
+                                    <h3 className="mb-3 text-lg font-semibold text-[var(--foreground)]">
+                                        {cert.title}
+                                    </h3>
+
+                                    <div className="flex items-center justify-between">
+                                        <p className="text-sm uppercase tracking-[0.14em] text-[var(--accent)]">
+                                            {cert.issuer}
+                                        </p>
+
+                                        <span
+                                            className={`rounded-lg px-3 py-1 text-xs font-medium ${cert.status === 'Completed'
+                                                    ? 'bg-green-500/10 text-green-400'
+                                                    : 'bg-yellow-500/10 text-yellow-400'
+                                                }`}
+                                        >
+                                            {cert.status}
+                                        </span>
+                                    </div>
+                                </motion.article>
+                            ))}
+                        </div>
+                    </section>
                     <motion.section
                         initial={{ opacity: 0, y: 24 }}
                         animate={{ opacity: 1, y: 0 }}
